@@ -1,38 +1,123 @@
-"use client"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {authClient} from "@/lib/auth-client"
-import {
-  Avatar,
-  AvatarBadge,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+"use client";
 
-export default function Page() {
-  const {data: session} = authClient.useSession()
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+import { DashboardLayout } from "@/components/dashboard/layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+type Opportunity = {
+  id: string;
+  title: string;
+  category: string;
+  organization: string | null;
+  location: string | null;
+  requirements: string | null;
+  deadline: string | null;
+  status: string;
+};
+
+type DashboardData = {
+  recommendedCount: number;
+  applicationsCount: number;
+  profileMatch: number;
+  topOpportunities: Opportunity[];
+};
+
+export default function HomePage() {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<DashboardData>({
+    recommendedCount: 0,
+    applicationsCount: 0,
+    profileMatch: 0,
+    topOpportunities: [],
+  });
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/dashboard")
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .catch((error) => console.error("Dashboard fetch error:", error))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
+    <DashboardLayout>
+      <div className="space-y-6">
         <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
+          <h1 className="text-3xl font-bold">Welcome back</h1>
+          <p className="text-muted-foreground">
+            Here are your latest recommended opportunities.
+          </p>
         </div>
-            <Avatar>
-      <AvatarImage src= {session?.user.image} alt="@shadcn" />
-      <AvatarFallback>CN</AvatarFallback>
-      <AvatarBadge className="bg-green-600 dark:bg-green-800" />
-    </Avatar>
-        <div className="font-mono text-xs text-muted-foreground">
-          {session?.user.name}
+
+        {loading && <p>Loading dashboard...</p>}
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recommended</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{data.recommendedCount}</p>
+              <p className="text-sm text-muted-foreground">Available matches</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Applications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{data.applicationsCount}</p>
+              <p className="text-sm text-muted-foreground">Submitted</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Match</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{data.profileMatch}%</p>
+              <p className="text-sm text-muted-foreground">Profile strength</p>
+            </CardContent>
+          </Card>
         </div>
-        <Badge className="w-max">{session?.user.role}</Badge>
-        
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Opportunities</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            {data.topOpportunities.length === 0 ? (
+              <p className="text-muted-foreground">
+                No opportunities available yet.
+              </p>
+            ) : (
+              data.topOpportunities.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between rounded-lg border p-4"
+                >
+                  <div>
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {item.organization} · {item.location}
+                    </p>
+                  </div>
+
+                  <Button asChild>
+                    <Link href={`/opportunities/${item.id}`}>View</Link>
+                  </Button>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </div>
-  )
+    </DashboardLayout>
+  );
 }
-
-

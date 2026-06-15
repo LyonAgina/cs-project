@@ -32,6 +32,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export default function SignInForm() {
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -47,15 +48,16 @@ export default function SignInForm() {
         password: data.password,
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           toast.success("Logged in successfully")
-          router.push("/")
-        },
-        onError: (error) => {
-          console.log("Error", error)
-          toast.error("Login failed", {
-            description: error.message,
-          })
+
+          const session = await authClient.getSession()
+
+          if (session.data?.user?.role === "admin") {
+               router.push("/admin")
+          } else {
+             router.push("/")
+             }
         },
       }
     )

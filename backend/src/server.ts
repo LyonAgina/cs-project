@@ -1,4 +1,9 @@
 import express from "express";
+import dashboardRoutes from "./routes/dashboard";
+import opportunitiesRoutes from "./routes/opportunities";
+import applicationRoutes from "./routes/applications";
+import profileRoutes from "./routes/profile";
+
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
@@ -15,6 +20,22 @@ import { and, count, eq, or } from "drizzle-orm";
 dotenv.config();
 
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+app.use(cookieParser());
+
+app.all("/api/auth/*", toNodeHandler(auth));
+app.use("/api", dashboardRoutes);
+app.use("/api", opportunitiesRoutes);
+app.use("/api", applicationRoutes);
+app.use("/api", profileRoutes);
+
 const PORT = process.env.PORT || 3000;
 const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${PORT}`;
 
