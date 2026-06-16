@@ -4,7 +4,6 @@ import {
   Briefcase,
   FileText,
   User,
-  Settings,
   Star,
   Bell,
 } from "lucide-react";
@@ -45,14 +44,6 @@ export function Sidebar() {
         >
           <User className="h-4 w-4" />
           Profile
-        </Link>
-
-        <Link
-          href="/settings"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-muted"
-        >
-          <Settings className="h-4 w-4" />
-          Settings
         </Link>
         <Link 
           href="/recommendations" 

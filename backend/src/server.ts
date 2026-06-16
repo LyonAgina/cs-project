@@ -3,6 +3,9 @@ import dashboardRoutes from "./routes/dashboard";
 import opportunitiesRoutes from "./routes/opportunities";
 import applicationRoutes from "./routes/applications";
 import profileRoutes from "./routes/profile";
+import usersRoutes from "./routes/users";
+import reportsRoutes from "./routes/reports";
+import notificationRoutes from "./routes/notifications";
 
 import cors from "cors";
 import dotenv from "dotenv";
@@ -35,6 +38,9 @@ app.use("/api", dashboardRoutes);
 app.use("/api", opportunitiesRoutes);
 app.use("/api", applicationRoutes);
 app.use("/api", profileRoutes);
+app.use("/api", usersRoutes);
+app.use("/api", reportsRoutes);
+app.use("/api", notificationRoutes);
 
 const PORT = process.env.PORT || 3000;
 const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${PORT}`;
